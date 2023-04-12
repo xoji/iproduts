@@ -1,8 +1,11 @@
 import Express, {json, urlencoded} from "express";
+import "./model";
 import cors from "cors";
 import {create} from "express-handlebars"
 import * as path from "path";
 import {bot} from "./bot/app";
+import {db} from "./db";
+import {debug} from "./debug";
 
 const app = Express();
 
@@ -52,8 +55,33 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
-app.listen(4000, "localhost", () => {
-  bot.updates.startPolling().then(() => {
-    console.log("app started on host: http://localhost:4000");
-  })
+
+bot.updates.startPolling().then(() => {
+  db.authenticate().then(() => {
+    console.log('Database is authenticated!');
+    db.sync().then(() => {
+      console.log('Database synchronized!');
+      app.listen(4000, "localhost", () => {
+        console.log("app started on host: http://localhost:4000");
+      });
+    }).catch((e) => {
+      debug({
+        message: `Database sync failed! error: ${e.message}`,
+        method: 'db.sync()',
+        file: 'app.ts'
+      });
+    });
+  }).catch((e) => {
+    debug({
+      message: `Database authenticate failed! error: ${e.message}`,
+      method: 'db.authenticate()',
+      file: 'app.ts'
+    });
+  });
+}).catch((e) => {
+  debug({
+    message: `Start bot polling failed! error: ${e.message}`,
+    method: 'startPolling()',
+    file: 'app.ts'
+  });
 });
