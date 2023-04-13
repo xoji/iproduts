@@ -1,1 +1,4 @@
 app.ts -- db.authenticate() -- Database authenticate failed! error: Access denied for user 'root'@'localhost' (using password: YES), Mon Apr 10 2023 03:55:43 GMT-0700 (Pacific Daylight Time);
+app.ts -- db.authenticate() -- Database authenticate failed! error: Unknown database 'iproduct', Thu Apr 13 2023 13:20:30 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- db.authenticate() -- Database authenticate failed! error: Access denied for user 'myappleu_iprod'@'localhost' (using password: YES), Thu Apr 13 2023 17:04:19 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- db.authenticate() -- Database authenticate failed! error: Access denied for user 'myappleu_iprod'@'localhost' (using password: YES), Thu Apr 13 2023 18:16:47 GMT+0500 (Узбекистан, стандартное время);

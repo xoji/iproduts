@@ -8,6 +8,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     declare isAdmin: boolean;
     declare isGroup: boolean;
     declare granted: CreationOptional<boolean>;
+    declare token: string | null;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 }
@@ -56,6 +57,7 @@ User.init({
     isAdmin: { type: DataTypes.BOOLEAN, allowNull: false },
     isGroup: { type: DataTypes.BOOLEAN, allowNull: false },
     granted: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    token: { type: DataTypes.TEXT, allowNull: true },
     createdAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     updatedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW }
 }, { tableName: 'users', sequelize: db });

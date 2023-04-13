@@ -6,6 +6,8 @@ import * as path from "path";
 import {bot} from "./bot/app";
 import {db} from "./db";
 import {debug} from "./debug";
+import jwt from "jsonwebtoken"
+import {Category} from "./model";
 
 const app = Express();
 
@@ -55,33 +57,89 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
+app.get('/category', async (req, res) => {
+  try {
+    const { user } = req.query;
+    if (!user) {
+      res.redirect('/');
+      return
+    }
+    const token = jwt.verify((user as string), 'bearer');
+    if (!token) {
+      res.redirect('/');
+      return
+    }
+    res.render('category.hbs');
+  } catch (e) {
+    res.redirect('/')
+  }
+});
 
-bot.updates.startPolling().then(() => {
-  db.authenticate().then(() => {
-    console.log('Database is authenticated!');
-    db.sync().then(() => {
-      console.log('Database synchronized!');
-      app.listen(4000, "localhost", () => {
-        console.log("app started on host: http://localhost:4000");
+app.post('/api/category', async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name) {
+      res.status(200).json({
+        status: false,
+        message: "No required data!"
       });
-    }).catch((e) => {
-      debug({
-        message: `Database sync failed! error: ${e.message}`,
-        method: 'db.sync()',
-        file: 'app.ts'
+      return
+    }
+    const created = await Category.create({
+      name: name
+    });
+    if (!created) {
+      res.status(200).json({
+        status: false,
+        message: "try again!"
+      });
+      return
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Success!"
+    });
+  } catch (e) {
+    debug({
+      message: (e as any).message,
+      file: 'app.ts',
+      method: '/api/category'
+    });
+    res.status(200).json({
+      status: false,
+      message: "Something went wrong!"
+    });
+  }
+})
+
+db.authenticate().then(() => {
+  console.log('Database is authenticated!');
+  db.sync().then(() => {
+    console.log('Database synchronized!');
+    app.listen(4000, "localhost", () => {
+      console.log("app started on host: http://localhost:4000");
+      bot.updates.startPolling().then(() => {
+        console.log('Bot polling started!');
+      }).catch((e) => {
+        debug({
+          message: `Start bot polling failed! error: ${e.toString()}`,
+          method: 'startPolling()',
+          file: 'app.ts'
+        });
       });
     });
   }).catch((e) => {
     debug({
-      message: `Database authenticate failed! error: ${e.message}`,
-      method: 'db.authenticate()',
+      message: `Database sync failed! error: ${e.message}`,
+      method: 'db.sync()',
       file: 'app.ts'
     });
   });
 }).catch((e) => {
   debug({
-    message: `Start bot polling failed! error: ${e.message}`,
-    method: 'startPolling()',
+    message: `Database authenticate failed! error: ${e.message}`,
+    method: 'db.authenticate()',
     file: 'app.ts'
   });
 });

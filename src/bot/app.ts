@@ -12,8 +12,8 @@ interface Commands {
 const controller = new BotController()
 const commands: Commands[] = [
   {
-    command: 'Добавить категории!',
-    callback: controller.addCategory,
+    command: 'Настройки ⚙️',
+    callback: controller.settings,
     authRequired: true
   },
   {
@@ -23,7 +23,11 @@ const commands: Commands[] = [
   }
 ]
 
-export const adminkeyboard = new KeyboardBuilder().textButton('Добавить продукт!').textButton('Добавить категории!').row().textButton('Настройки ⚙️').resize();
+export const adminkeyboard = new KeyboardBuilder().textButton('Добавить продукт!').webAppButton("Добавить категории!", "https://iproduct.uz/category?user").row().textButton('Настройки ⚙️').resize();
+
+export function buildAdminKeyboard(token: string) {
+  return new KeyboardBuilder().textButton('Добавить продукт!').webAppButton("Добавить категории!", `https://iproduct.uz/category?user=${token}`).row().textButton('Настройки ⚙️').resize()
+}
 export const keyboard = new KeyboardBuilder().textButton('Войти').resize()
 
 bot.updates.on("message", async (context: MessageContext) => {
@@ -39,14 +43,14 @@ bot.updates.on("message", async (context: MessageContext) => {
         }
       }
       if (!success) {
-        await context.send('Извините, я вас не понял! 😅', {reply_markup: adminkeyboard});
+        await context.send('Извините, я вас не понял! 😅', {reply_markup: buildAdminKeyboard(user.token!)});
       }
     } else {
       if (context.text === '31141bb6-3b4c-4d7c-badd-4a52efd596f4') {
         await user.update({
           granted: true, updatedAt: new Date()
         });
-        await context.send('Добро пожаловать! 😊', {reply_markup: adminkeyboard});
+        await context.send('Добро пожаловать! 😊', {reply_markup: buildAdminKeyboard(user.token!)});
       } else {
         await context.send('Неправильный пароль! Попробуйте снова!', {reply_markup: {remove_keyboard: true}});
       }

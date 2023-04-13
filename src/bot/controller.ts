@@ -1,6 +1,6 @@
 import {MessageContext} from "puregram";
 import {User} from "../model";
-import {adminkeyboard} from "./app";
+import {adminkeyboard, buildAdminKeyboard} from "./app";
 import {debug} from "../debug";
 
 export class BotController {
@@ -8,11 +8,19 @@ export class BotController {
 
     }
 
+    async settings(context: MessageContext) {
+        try {
+            await context.send('Извините но настройки сейчас недоступно!');
+        } catch (e) {
+
+        }
+    }
+
     async login(context: MessageContext) {
         try {
             const user = await User.findOne({ where: { chat_id: context.chatId } });
             if (user && user.granted) {
-                await context.send('Вы уже в системе! 😉', {reply_markup: adminkeyboard});
+                await context.send('Вы уже в системе! 😉', {reply_markup: buildAdminKeyboard(user.token!)});
             }
             const created = await User.create({
                 name: context.chat.firstName || '',
