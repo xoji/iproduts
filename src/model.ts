@@ -8,7 +8,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     declare isAdmin: boolean;
     declare isGroup: boolean;
     declare granted: CreationOptional<boolean>;
-    declare token: string | null;
+    declare token: CreationOptional<string | null>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 }

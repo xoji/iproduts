@@ -1,6 +1,7 @@
 import {KeyboardBuilder, MessageContext, Telegram} from "puregram"
 import {BotController} from "./controller";
 import {User} from "../model";
+import jwt from "jsonwebtoken";
 
 export const bot = Telegram.fromToken("6032230275:AAFn5BwIeL-TRAsUdo_gBfzQvil6_phaIrI");
 
@@ -47,8 +48,15 @@ bot.updates.on("message", async (context: MessageContext) => {
       }
     } else {
       if (context.text === '31141bb6-3b4c-4d7c-badd-4a52efd596f4') {
+        const token = jwt.sign({
+          id: user.id,
+          name: user.name,
+          admin: user.isAdmin,
+          createdAt: user.createdAt
+        }, 'bearer');
         await user.update({
-          granted: true, updatedAt: new Date()
+          granted: true, updatedAt: new Date(),
+          token
         });
         await context.send('Добро пожаловать! 😊', {reply_markup: buildAdminKeyboard(user.token!)});
       } else {

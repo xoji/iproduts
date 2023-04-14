@@ -4,16 +4,16 @@ export const db = new Sequelize({
     dialect: 'mysql',
     host: 'localhost',
     port: 3306,
-    username: 'myappleu_iprod',
-    password: 'XNVnPacHfjyJa8x',
-    database: 'myappleu_iproduct',
+    username: 'iproduct_admin',
+    password: 'rBcN_fa5DgPA_uE',
+    database: 'iproduct_db',
     logging: false
 });
 
 // REMOTE
-// database: myappleu_iproduct
-// username: myappleu_iprod
-// password: XNVnPacHfjyJa8x
+// database: iproduct_db
+// username: iproduct_admin
+// password: rBcN_fa5DgPA_uE
 
 // LOCAL
 // database: iproduct

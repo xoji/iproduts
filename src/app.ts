@@ -115,13 +115,14 @@ app.post('/api/category', async (req, res) => {
 
 db.authenticate().then(() => {
   console.log('Database is authenticated!');
-  db.sync().then(() => {
+  db.sync({force: true}).then(() => {
     console.log('Database synchronized!');
     app.listen(4000, "localhost", () => {
       console.log("app started on host: http://localhost:4000");
       bot.updates.startPolling().then(() => {
         console.log('Bot polling started!');
       }).catch((e) => {
+        console.log(e)
         debug({
           message: `Start bot polling failed! error: ${e.toString()}`,
           method: 'startPolling()',

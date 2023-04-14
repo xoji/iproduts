@@ -2,3 +2,10 @@ app.ts -- db.authenticate() -- Database authenticate failed! error: Access denie
 app.ts -- db.authenticate() -- Database authenticate failed! error: Unknown database 'iproduct', Thu Apr 13 2023 13:20:30 GMT+0500 (Узбекистан, стандартное время);
 app.ts -- db.authenticate() -- Database authenticate failed! error: Access denied for user 'myappleu_iprod'@'localhost' (using password: YES), Thu Apr 13 2023 17:04:19 GMT+0500 (Узбекистан, стандартное время);
 app.ts -- db.authenticate() -- Database authenticate failed! error: Access denied for user 'myappleu_iprod'@'localhost' (using password: YES), Thu Apr 13 2023 18:16:47 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- db.authenticate() -- Database authenticate failed! error: connect ECONNREFUSED 127.0.0.1:3306, Fri Apr 14 2023 19:33:17 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- db.authenticate() -- Database authenticate failed! error: connect ECONNREFUSED 127.0.0.1:3306, Fri Apr 14 2023 19:33:45 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- db.authenticate() -- Database authenticate failed! error: connect ECONNREFUSED 127.0.0.1:3306, Fri Apr 14 2023 19:34:30 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- db.authenticate() -- Database authenticate failed! error: connect ECONNREFUSED 127.0.0.1:3306, Fri Apr 14 2023 19:34:41 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- db.authenticate() -- Database authenticate failed! error: connect ECONNREFUSED 127.0.0.1:3306, Fri Apr 14 2023 19:34:49 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- db.authenticate() -- Database authenticate failed! error: connect ECONNREFUSED 127.0.0.1:3306, Fri Apr 14 2023 19:35:18 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- db.authenticate() -- Database authenticate failed! error: connect ECONNREFUSED 127.0.0.1:3306, Fri Apr 14 2023 19:35:56 GMT+0500 (Узбекистан, стандартное время);
