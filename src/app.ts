@@ -119,7 +119,7 @@ db.authenticate().then(() => {
     console.log('Database synchronized!');
     app.listen(4000, "localhost", () => {
       console.log("app started on host: http://localhost:4000");
-      bot.updates.startPolling().then(() => {
+      bot.start().then(() => {
         console.log('Bot polling started!');
       }).catch((e) => {
         console.log(e)
