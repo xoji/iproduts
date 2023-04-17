@@ -2,9 +2,6 @@ import {BotController} from "./controller";
 import {User} from "../model";
 import jwt from "jsonwebtoken";
 import {ReplyKeyboardMarkup, TGResult} from "../types";
-import {Telegram} from "../features/bot";
-
-export const bot = new Telegram("6032230275:AAFn5BwIeL-TRAsUdo_gBfzQvil6_phaIrI");
 
 interface Commands {
   command: string;
@@ -58,8 +55,8 @@ export const keyboard: ReplyKeyboardMarkup = {
   ],
   resize_keyboard: true
 }
-//
-bot.on("message", async (context: TGResult) => {
+
+export async function update(context: TGResult) {
   if (context.send) {
     const user = await User.findOne({ where: {chat_id: context.message!.chat.id} });
     if (user) {
@@ -106,4 +103,4 @@ bot.on("message", async (context: TGResult) => {
       }
     }
   }
-});
+}

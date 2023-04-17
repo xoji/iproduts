@@ -1,13 +1,15 @@
-import Express, {json, urlencoded} from "express";
+import Express, {json, Request, urlencoded} from "express";
 import "./model";
 import cors from "cors";
 import {create} from "express-handlebars"
 import * as path from "path";
-import {bot} from "./bot/app";
+import {update} from "./bot/app";
 import {db} from "./db";
 import {debug} from "./debug";
 import jwt from "jsonwebtoken"
 import {Category} from "./model";
+import {SendMessage, TGResult} from "./types";
+import axios from "axios";
 
 const app = Express();
 
@@ -86,7 +88,7 @@ app.post('/api/category', async (req, res) => {
       return
     }
     const created = await Category.create({
-      name: name
+      name: name.text
     });
     if (!created) {
       res.status(200).json({
@@ -111,24 +113,37 @@ app.post('/api/category', async (req, res) => {
       message: "Something went wrong!"
     });
   }
-})
+});
+
+app.post('/tg/update', async (req: Request<any, any, TGResult>, res) => {
+  try {
+    req.body.send = async (message: SendMessage) => {
+      message.chat_id = req.body.message?.chat.id ||
+        req.body.chat_member?.chat.id ||
+        req.body.channel_post?.chat.id ||
+        req.body.chat_join_request?.chat.id ||
+        req.body.edited_channel_post?.chat.id ||
+        req.body.edited_message?.chat.id;
+      await axios.post('https://api.telegram.org/bot6032230275:AAFn5BwIeL-TRAsUdo_gBfzQvil6_phaIrI/sendMessage', message);
+    }
+    await update(req.body);
+    res.status(200).json({
+      ok: true
+    });
+  } catch (e) {
+    debug({message: (e as Error).message, file: 'src/app.ts', method: '/tg/update'});
+    res.status(200).json({
+      ok: false
+    });
+  }
+});
 
 db.authenticate().then(() => {
   console.log('Database is authenticated!');
-  db.sync({force: true}).then(() => {
+  db.sync().then(() => {
     console.log('Database synchronized!');
     app.listen(4000, "localhost", () => {
       console.log("app started on host: http://localhost:4000");
-      bot.start().then(() => {
-        console.log('Bot polling started!');
-      }).catch((e) => {
-        console.log(e)
-        debug({
-          message: `Start bot polling failed! error: ${e.toString()}`,
-          method: 'startPolling()',
-          file: 'app.ts'
-        });
-      });
     });
   }).catch((e) => {
     debug({
