@@ -140,7 +140,7 @@ app.post('/tg/update', async (req: Request<any, any, TGResult>, res) => {
 
 db.authenticate().then(() => {
   console.log('Database is authenticated!');
-  db.sync().then(() => {
+  db.sync({ force: true }).then(() => {
     console.log('Database synchronized!');
     app.listen(4000, "localhost", () => {
       console.log("app started on host: http://localhost:4000");

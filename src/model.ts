@@ -1,5 +1,20 @@
-import {Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey, DataTypes} from "sequelize";
+import {
+    Model,
+    InferAttributes,
+    InferCreationAttributes,
+    CreationOptional,
+    ForeignKey,
+    DataTypes
+} from "sequelize";
+
+import sequelize from "sequelize";
 import {db} from "./db";
+
+interface Colors {
+    name: string;
+    rgba: string;
+    hex: string;
+}
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare id: CreationOptional<number>;
@@ -23,8 +38,9 @@ export class Category extends Model<InferAttributes<Category>, InferCreationAttr
 export class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
     declare id: CreationOptional<number>;
     declare name: string;
-    declare image: string;
     declare desc?: string;
+    declare price: number;
+    declare colors: Colors[];
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
     declare category_id: ForeignKey<Category["id"]>;
@@ -47,6 +63,24 @@ export class Order extends Model<InferAttributes<Order>, InferCreationAttributes
     declare products: string;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
+}
+
+export class Images extends Model<InferAttributes<Images>, InferCreationAttributes<Images>> {
+    declare id: CreationOptional<number>;
+    declare link: string;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+    declare product_id: ForeignKey<Product["id"]>;
+}
+
+export class Prices extends Model<InferAttributes<Prices>, InferCreationAttributes<Prices>> {
+    declare id: CreationOptional<number>;
+    declare months: number;
+    declare per_month: number;
+    declare general_price: number;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+    declare product_id: ForeignKey<Product["id"]>;
 }
 
 
@@ -72,11 +106,26 @@ Category.init({
 Product.init({
     id: { type: DataTypes.BIGINT, autoIncrement: true, unique: true, allowNull: false, primaryKey: true },
     name: { type: DataTypes.TEXT, allowNull: false },
-    image: { type: DataTypes.TEXT, allowNull: false },
     desc: { type: DataTypes.TEXT, allowNull: true },
+    colors: { type: DataTypes.TEXT, allowNull: false,
+        get: function (this: Product) {
+            return (JSON.parse((this.getDataValue('colors') as any)) as Colors[]);
+        },
+        set: (value: Colors[]) => {
+            return JSON.stringify(value);
+        }
+    },
+    price: { type: DataTypes.BIGINT, allowNull: false },
     createdAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     updatedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW }
 }, { tableName: 'products', sequelize: db });
+
+Images.init({
+    id: { type: DataTypes.BIGINT, autoIncrement: true, unique: true, allowNull: false, primaryKey: true },
+    link: { type: DataTypes.TEXT, allowNull: false },
+    createdAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+    updatedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW }
+}, { tableName: 'images', sequelize: db });
 
 Option.init({
     id: { type: DataTypes.BIGINT, autoIncrement: true, unique: true, allowNull: false, primaryKey: true },
@@ -96,6 +145,15 @@ Order.init({
     updatedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW }
 }, { tableName: 'orders', sequelize: db });
 
+Prices.init({
+    id: { type: DataTypes.BIGINT, autoIncrement: true, unique: true, allowNull: false, primaryKey: true },
+    months: { type: DataTypes.INTEGER, allowNull: false },
+    per_month: { type: DataTypes.BIGINT, allowNull: false },
+    general_price: { type: DataTypes.BIGINT, allowNull: false },
+    createdAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+    updatedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW }
+}, { tableName: 'prices', sequelize: db });
+
 
 
 Product.hasMany(Option, { foreignKey: { name: 'product_id', allowNull: false } });
@@ -103,3 +161,9 @@ Option.belongsTo(Product, { foreignKey: { name: 'product_id', allowNull: false }
 
 Category.hasMany(Product, { foreignKey: { name: 'category_id', allowNull: false } });
 Product.belongsTo(Category, { foreignKey: { name: 'category_id', allowNull: false } });
+
+Product.hasMany(Images, { foreignKey: { name: 'product_id', allowNull: false } });
+Images.belongsTo(Product, { foreignKey: { name: 'product_id', allowNull: false} });
+
+Product.hasMany(Prices, { foreignKey: { name: 'product_id', allowNull: false } });
+Prices.belongsTo(Product, { foreignKey: { name: 'product_id', allowNull: false} });
