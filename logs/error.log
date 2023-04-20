@@ -41,3 +41,4 @@ features/bot.ts -- start -- timeout of 20000ms exceeded, Mon Apr 17 2023 01:32:2
 features/bot.ts -- start -- timeout of 20000ms exceeded, Mon Apr 17 2023 01:32:47 GMT+0500 (Uzbekistan Standard Time);
 features/bot.ts -- start -- timeout of 20000ms exceeded, Mon Apr 17 2023 01:33:07 GMT+0500 (Uzbekistan Standard Time);
 features/bot.ts -- start -- timeout of 20000ms exceeded, Mon Apr 17 2023 01:33:27 GMT+0500 (Uzbekistan Standard Time);
+app.ts -- db.authenticate() -- Database authenticate failed! error: connect ECONNREFUSED 127.0.0.1:3306, Thu Apr 20 2023 16:12:38 GMT+0500 (Узбекистан, стандартное время);

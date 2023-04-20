@@ -10,7 +10,6 @@ import {db} from "./db";
 
 interface Colors {
     name: string;
-    rgba: string;
     hex: string;
 }
 

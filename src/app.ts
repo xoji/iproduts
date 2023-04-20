@@ -7,7 +7,7 @@ import {update} from "./bot/app";
 import {db} from "./db";
 import {debug} from "./debug";
 import jwt from "jsonwebtoken"
-import {Category} from "./model";
+import {Category, Images, Option, Product} from "./model";
 import {SendMessage, TGResult} from "./types";
 import axios from "axios";
 
@@ -55,8 +55,30 @@ app.use(urlencoded({ extended: true }));
 
 app.use('/', Express.static(path.resolve(__dirname, '..', 'static')))
 
-app.get('/', (req, res) => {
-  res.render('index');
+app.get('/', async (req, res) => {
+  const result: any[] = [];
+  const categories = await Category.findAll({raw: true});
+  for (const c of categories) {
+    const products = await Product.findAll({where: { category_id: c.id }, raw: true});
+    const prod: any[] = [];
+    for (const p of products) {
+      const options = await Option.findAll({ where: { product_id: p.id }, raw: true });
+      const image = await Images.findOne({ where: { product_id: p.id }, raw: true });
+      prod.push({
+        product: p,
+        options: options,
+        image: image
+      });
+    }
+    result.push({
+      category: c,
+      products: prod
+    });
+  }
+
+  res.render('index', {
+    data: result
+  });
 });
 
 app.get('/category', async (req, res) => {
@@ -76,6 +98,10 @@ app.get('/category', async (req, res) => {
     res.redirect('/')
   }
 });
+
+app.get('/product/:id', async (req, res) => {
+  res.render('single-post');
+})
 
 app.post('/api/category', async (req, res) => {
   try {
