@@ -6,8 +6,6 @@ import {
     ForeignKey,
     DataTypes
 } from "sequelize";
-
-import sequelize from "sequelize";
 import {db} from "./db";
 
 interface Colors {
