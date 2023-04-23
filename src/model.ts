@@ -15,7 +15,7 @@ interface Colors {
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare id: CreationOptional<number>;
-    declare name: string;
+    declare name?: string;
     declare chat_id: string;
     declare isAdmin: boolean;
     declare isGroup: boolean;
@@ -83,7 +83,7 @@ export class Prices extends Model<InferAttributes<Prices>, InferCreationAttribut
 
 User.init({
     id: { type: DataTypes.BIGINT, autoIncrement: true, unique: true, allowNull: false, primaryKey: true },
-    name: { type: DataTypes.STRING, allowNull: false },
+    name: { type: DataTypes.STRING, allowNull: true },
     chat_id: { type: DataTypes.TEXT, allowNull: false },
     isAdmin: { type: DataTypes.BOOLEAN, allowNull: false },
     isGroup: { type: DataTypes.BOOLEAN, allowNull: false },
@@ -108,8 +108,8 @@ Product.init({
         get: function (this: Product) {
             return (JSON.parse((this.getDataValue('colors') as any)) as Colors[]);
         },
-        set: (value: Colors[]) => {
-            return JSON.stringify(value);
+        set: function (this: Product, value: Colors[]) {
+            this.setDataValue('colors', (JSON.stringify(value) as any));
         }
     },
     price: { type: DataTypes.BIGINT, allowNull: false },

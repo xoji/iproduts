@@ -649,7 +649,7 @@ export interface SendMessage {
     chat_id?: number | string;
     message_thread_id?: number;
     text: string;
-    parse_mode?: string;
+    parse_mode?: 'MarkdownV2' | 'HTML' | 'Markdown';
     entities?: MessageEntity[];
     disable_web_page_preview?: boolean;
     disable_notification?: boolean;

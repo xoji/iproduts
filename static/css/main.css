@@ -166,7 +166,7 @@ body::-webkit-scrollbar-thumb {
 /*section-block-main*/
 
 .__background_1{
-    background: url("assets/background.jpg");
+    background: url("/assets/background.jpg");
     background-size: cover;
 }
 
@@ -178,7 +178,7 @@ body::-webkit-scrollbar-thumb {
     object-fit: contain;
 }
 .__background_2{
-    background: url("assets/c837a6_98a516fd3a66427ab4cd0cf2b2a13ca2_mv2.webp") center/ cover no-repeat fixed;
+    background: url("/assets/c837a6_98a516fd3a66427ab4cd0cf2b2a13ca2_mv2.webp") center/ cover no-repeat fixed;
 }
 .__background_opacity:after{
     content: "";
@@ -272,7 +272,7 @@ body::-webkit-scrollbar-thumb {
 /*presentation-page*/
 .presentation-area{
     display: flex;
-    height: 925px;
+    height: 750px;
 }
 .presentation-text-content{
     display: flex;
@@ -313,13 +313,11 @@ body::-webkit-scrollbar-thumb {
 .price-num-text{
     font-size: 20px;
     font-weight: bold;
-    margin-top: 30px;
 }
 .parameter-main-block{
     list-style: none;
     padding: 0;
-    margin-top: 30px ;
-    width: 78%;
+    margin-top: 30px;
 }
 .parameter-item{
     display: flex;
@@ -336,10 +334,12 @@ body::-webkit-scrollbar-thumb {
     position: relative;
 }
 .present-img-item{
-    margin-top: 128px;
-    margin-left: -240px;
-    position: relative;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
     z-index: 1;
+    width: min-content;
 }
 .background-3{
     background: rgb(110,110,110);
@@ -408,7 +408,6 @@ body::-webkit-scrollbar-thumb {
     font-size: 18px;
     text-align: center;
     cursor: default;
-    display: none;
 }
 .product-img{
     border-radius: 8px;
@@ -532,6 +531,7 @@ body::-webkit-scrollbar-thumb {
     display: flex;
     flex-direction: column;
     width: 20%;
+    margin-left: 50px;
 }
 .select_img_section{
     width: 30%;
@@ -616,6 +616,7 @@ body::-webkit-scrollbar-thumb {
     width: 100%;
     align-items: center;
     background: transparent;
+    cursor: pointer;
 }
 .select_product_text_des{
     max-height: 0;
@@ -760,6 +761,10 @@ body::-webkit-scrollbar-thumb {
     justify-content: space-between;
     align-items: center;
     margin-top: 20px;
+}
+
+.swiper-slide-thumb-active .img-mini-slider__image {
+    border: 2px solid #ffffff;
 }
 /*footer*/
 @media (max-width: 2560px) {
@@ -916,6 +921,7 @@ body::-webkit-scrollbar-thumb {
     .select_content_section{
         width: 100%;
         margin-top: 50px;
+        margin-left: 0;
     }
     .s-bnt{
         width: 100%;
@@ -1096,6 +1102,7 @@ body::-webkit-scrollbar-thumb {
     .select_content_section{
         width: 100%;
         margin-top: 50px;
+        margin-left: 0;
     }
     .s-bnt{
         width: 100%;

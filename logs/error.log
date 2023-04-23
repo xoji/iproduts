@@ -42,3 +42,8 @@ features/bot.ts -- start -- timeout of 20000ms exceeded, Mon Apr 17 2023 01:32:4
 features/bot.ts -- start -- timeout of 20000ms exceeded, Mon Apr 17 2023 01:33:07 GMT+0500 (Uzbekistan Standard Time);
 features/bot.ts -- start -- timeout of 20000ms exceeded, Mon Apr 17 2023 01:33:27 GMT+0500 (Uzbekistan Standard Time);
 app.ts -- db.authenticate() -- Database authenticate failed! error: connect ECONNREFUSED 127.0.0.1:3306, Thu Apr 20 2023 16:12:38 GMT+0500 (Узбекистан, стандартное время);
+app.ts -- /product/create -- notNull Violation: Product.colors cannot be null, Sat Apr 22 2023 18:05:31 GMT+0500 (Uzbekistan Standard Time);
+app.ts -- /product/create -- notNull Violation: Product.colors cannot be null, Sat Apr 22 2023 18:07:04 GMT+0500 (Uzbekistan Standard Time);
+app.ts -- /product/create -- notNull Violation: Product.colors cannot be null, Sat Apr 22 2023 18:08:32 GMT+0500 (Uzbekistan Standard Time);
+app.ts -- /product/create -- this.setDataValue is not a function, Sat Apr 22 2023 18:12:42 GMT+0500 (Uzbekistan Standard Time);
+app.ts -- db.authenticate() -- Database authenticate failed! error: Access denied for user 'iproduct_admin'@'localhost' (using password: YES), Sun Apr 23 2023 15:46:21 GMT+0500 (Uzbekistan Standard Time);

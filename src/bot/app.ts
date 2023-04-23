@@ -27,7 +27,10 @@ export function buildAdminKeyboard(token: string): ReplyKeyboardMarkup {
     keyboard: [
         [
           {
-            text: 'Добавить продукт!'
+            text: 'Добавить продукт!',
+            web_app: {
+              url: `https://iproduct.uz/set-product?user=${token}`
+            }
           },
           {
             text: 'Добавить категории!',
@@ -57,49 +60,66 @@ export const keyboard: ReplyKeyboardMarkup = {
 }
 
 export async function update(context: TGResult) {
-  if (context.send) {
-    const user = await User.findOne({ where: {chat_id: context.message!.chat.id} });
-    if (user) {
-      if (user.granted) {
-        let success = false;
-        for (const c of commands) {
-          if (context.message!.text === c.command) {
-            c.callback(context);
-            success = true;
-            break
+  if (context.message) {
+    if (context.send) {
+      if (context.message.chat.type === 'group' || context.message.chat.type === 'supergroup') {
+        const user = await User.findOne({ where: {isGroup: true, chat_id: context.message.chat.id} });
+        if (!user) {
+          if (context.message.text === 'bfa3825b-d172-4bc4-8ba8-610231d0b419') {
+            await User.create({
+              isAdmin: true,
+              chat_id: `${context.message.chat.id}`,
+              isGroup: true,
+              granted: true
+            });
+          }
+          return
+        }
+      } else if (context.message.chat.type === 'private') {
+        const user = await User.findOne({ where: {chat_id: context.message.chat.id} });
+        if (user) {
+          if (user.granted) {
+            let success = false;
+            for (const c of commands) {
+              if (context.message.text === c.command) {
+                c.callback(context);
+                success = true;
+                break
+              }
+            }
+            if (!success) {
+              await context.send({text: 'Извините, я вас не понял! 😅', reply_markup: buildAdminKeyboard(user.token!)});
+            }
+          } else {
+            if (context.message.text === '31141bb6-3b4c-4d7c-badd-4a52efd596f4') {
+              const token = jwt.sign({
+                id: user.id,
+                name: user.name,
+                admin: user.isAdmin,
+                createdAt: user.createdAt
+              }, 'bearer');
+              await user.update({
+                granted: true, updatedAt: new Date(),
+                token
+              });
+              await context.send({text: 'Добро пожаловать! 😊', reply_markup: buildAdminKeyboard(user.token!)});
+            } else {
+              await context.send({text: 'Неправильный пароль! Попробуйте снова!', reply_markup: {remove_keyboard: true}});
+            }
+          }
+        } else {
+          let success: boolean = false;
+          for (const c of commands) {
+            if (!c.authRequired && c.command === context.message.text) {
+              c.callback(context);
+              success = true;
+              break
+            }
+          }
+          if (!success) {
+            await context.send({text: 'У вас нет доступа к этому боту!', reply_markup: keyboard});
           }
         }
-        if (!success) {
-          await context.send({text: 'Извините, я вас не понял! 😅', reply_markup: buildAdminKeyboard(user.token!)});
-        }
-      } else {
-        if (context.message!.text === '31141bb6-3b4c-4d7c-badd-4a52efd596f4') {
-          const token = jwt.sign({
-            id: user.id,
-            name: user.name,
-            admin: user.isAdmin,
-            createdAt: user.createdAt
-          }, 'bearer');
-          await user.update({
-            granted: true, updatedAt: new Date(),
-            token
-          });
-          await context.send({text: 'Добро пожаловать! 😊', reply_markup: buildAdminKeyboard(user.token!)});
-        } else {
-          await context.send({text: 'Неправильный пароль! Попробуйте снова!', reply_markup: {remove_keyboard: true}});
-        }
-      }
-    } else {
-      let success: boolean = false;
-      for (const c of commands) {
-        if (!c.authRequired && c.command === context.message!.text) {
-          c.callback(context);
-          success = true;
-          break
-        }
-      }
-      if (!success) {
-        await context.send({text: 'У вас нет доступа к этому боту!', reply_markup: keyboard});
       }
     }
   }

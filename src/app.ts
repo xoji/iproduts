@@ -7,9 +7,10 @@ import {update} from "./bot/app";
 import {db} from "./db";
 import {debug} from "./debug";
 import jwt from "jsonwebtoken"
-import {Category, Images, Option, Product} from "./model";
+import {Category, Images, Option, Prices, Product, User} from "./model";
 import {SendMessage, TGResult} from "./types";
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
+import fileUpload from "express-fileupload";
 
 const app = Express();
 
@@ -52,6 +53,10 @@ app.disable('x-powered-by');
 app.use(cors());
 app.use(json());
 app.use(urlencoded({ extended: true }));
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: path.join(__dirname, '..', '/static/tmp')
+}))
 
 app.use('/', Express.static(path.resolve(__dirname, '..', 'static')))
 
@@ -64,6 +69,7 @@ app.get('/', async (req, res) => {
     for (const p of products) {
       const options = await Option.findAll({ where: { product_id: p.id }, raw: true });
       const image = await Images.findOne({ where: { product_id: p.id }, raw: true });
+      p.desc = p.desc!.length > 500 ? `${p.desc?.slice(0, 500)} ...` : p.desc;
       prod.push({
         product: p,
         options: options,
@@ -93,14 +99,50 @@ app.get('/category', async (req, res) => {
       res.redirect('/');
       return
     }
-    res.render('category.hbs');
+    res.render('category');
   } catch (e) {
     res.redirect('/')
   }
 });
 
+app.get('/set-product', async (req, res) => {
+  try {
+    const { user } = req.query;
+    if (!user) {
+      res.redirect('/');
+      return
+    }
+    const token = jwt.verify((user as string), 'bearer');
+    if (!token) {
+      res.redirect('/');
+      return
+    }
+    res.render('product');
+  } catch (e) {
+    res.redirect('/');
+  }
+})
+
 app.get('/product/:id', async (req, res) => {
-  res.render('single-post');
+  const prod = await Product.findOne({ where: {id: req.params.id}, raw: true });
+  if (!prod) {
+    res.redirect('/');
+    return
+  }
+  const prices = await Prices.findAll({ where: { product_id: prod.id }, raw: true });
+  for (let i = 0; i < prices.length; i++) {
+    (prices[i].general_price as any) = prices[i].general_price.toLocaleString('ru-RU');
+    (prices[i].per_month as any) = prices[i].per_month.toLocaleString('ru-RU');
+  }
+  (prod.price as any) = prod.price.toLocaleString('ru-RU');
+  (prod.colors as any) = JSON.parse(prod.colors as any);
+  (prod as any).options = await Option.findAll({ where: { product_id: prod.id }, raw: true });
+  (prod as any).prices = prices;
+  (prod as any).images = await Images.findAll({ where: { product_id: prod.id }, raw: true });
+  res.render('single-post', {
+    product: prod,
+    prod_as_string: JSON.stringify(prod)
+  });
 })
 
 app.post('/api/category', async (req, res) => {
@@ -164,9 +206,122 @@ app.post('/tg/update', async (req: Request<any, any, TGResult>, res) => {
   }
 });
 
+app.get('/get/categories', async (req, res) => {
+  const categories = await Category.findAll();
+  res.status(200).json({
+    status: true,
+    data: categories
+  });
+});
+
+app.post('/product/create', async (req, res) => {
+  try {
+    if (!req.files) {
+      res.status(200).json({
+        status: false,
+        message: 'Вы не выбрали файл!'
+      });
+      return
+    }
+    let { name, desc, category_id, price, prices, colors, chars } = req.body;
+    if (!name || !desc || !category_id || !price || !prices || !colors || !chars) {
+      res.status(200).json({
+        status: false,
+        message: 'Необходимо заполнить все поля!'
+      });
+      return
+    }
+
+    category_id = parseInt(category_id);
+    price = parseInt(price);
+    prices = JSON.parse(prices);
+    colors = JSON.parse(colors);
+    chars = JSON.parse(chars);
+
+    const prod = await Product.create({
+      name, desc, category_id, price, colors
+    });
+    if (Array.isArray(req.files.images)) {
+      for (const i of req.files.images) {
+        const fileName = new Date().getTime();
+        await i.mv(path.resolve(__dirname, '..', 'static', 'assets', `${fileName}${path.extname(i.name)}`));
+        await Images.create({
+          link: `/assets/${fileName}${path.extname(i.name)}`,
+          product_id: prod.id
+        });
+      }
+    } else {
+      const fileName = new Date().getTime();
+      await req.files.images.mv(path.resolve(__dirname, '..', 'static', 'assets', `${fileName}${path.extname(req.files.images.name)}`));
+      await Images.create({
+        link: `/assets/${fileName}${path.extname(req.files.images.name)}`,
+        product_id: prod.id
+      });
+    }
+    for (const p of prices) {
+      await Prices.create({
+        months: p.months,
+        general_price: p.general_price,
+        per_month: p.per_month,
+        product_id: prod.id
+      });
+    }
+
+    for (const ch of chars) {
+      await Option.create({
+        key: ch.key,
+        value: ch.value,
+        product_id: prod.id
+      });
+    }
+    res.status(200).json({
+      status: true
+    });
+  } catch (e) {
+    console.log((e as Error).toString(), (e as Error).stack);
+    debug({message: (e as Error).message, file: 'app.ts', method: '/product/create'});
+  }
+});
+
+app.post('/send-order', async (req, res) => {
+  try {
+    const { products, name, phone } = req.body;
+    let content = '';
+
+    for (const p of products) {
+      content += `<b>${p.name}</b>\n <b>Цена:</b> ${p.price} Сум\n количество: ${p.count}\n <b>Цены в рассрочку</b>\n`;
+      for (const price of p.prices) {
+        content += `<pre>  • <b>Мес.: ${price.months}</b>, <b>За мес.: ${price.per_month} Сум</b></pre>\n`
+      }
+      content += '<b>Цвета: </b>\n';
+      for (const c of p.colors) {
+        content += `<pre>  • <b style="color: ${c.hex}">${c.name}</b></pre>\n`
+      }
+    }
+    content += `\n\n\n<b>Имя: ${name}</b>\n`;
+    content += `<b>Телефон: ${phone}</b>`;
+
+    const users = await User.findAll({ where: { isGroup: true } });
+
+    for (const u of users) {
+      await axios.post<any, AxiosResponse<any, any>, SendMessage>('https://api.telegram.org/bot6032230275:AAFn5BwIeL-TRAsUdo_gBfzQvil6_phaIrI/sendMessage', {
+        chat_id: u.chat_id,
+        text: content,
+        parse_mode: 'HTML'
+      });
+    }
+    res.status(200).json({
+      status: true,
+      message: 'Успешно!'
+    })
+  } catch (e) {
+
+  }
+})
+
 db.authenticate().then(() => {
   console.log('Database is authenticated!');
-  db.sync({ force: true }).then(() => {
+  db.sync().then(() => {
     console.log('Database synchronized!');
     app.listen(4000, "localhost", () => {
       console.log("app started on host: http://localhost:4000");

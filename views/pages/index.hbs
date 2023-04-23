@@ -14,61 +14,57 @@
     </section>
   </div>
   {{#each data}}
-    <div class="swiper swiper_{{@index}}">
-      <div class="swiper-wrapper">
-        {{#each this.products}}
-          <div class="swiper-slide">
-            <div class="presentation-area">
-              <div class="presentation-text-content __background_2">
-                <div class="__background_opacity"></div>
-                <div class="p-r-title-block">
-                  <span class="p-r-title-text">iProduct</span>
-                </div>
-                <div class="p-r-content-body-text">
-                  <p class="p-r-des-text mar-b-36">{{this.product.name}}</p>
-                  <p class="p-r-des-text-2 mar-b-36  mar-b-10">{{this.product.desc}}</p>
-                  <ul class="parameter-main-block">
-                    {{#each this.options}}
+    {{#if this.products.length}}
+      <div class="swiper swiper_{{@index}}">
+        <div class="swiper-wrapper">
+          {{#each this.products}}
+            <div class="swiper-slide">
+              <div class="presentation-area">
+                <div class="presentation-text-content __background_2">
+                  <div class="__background_opacity"></div>
+                  <div class="p-r-title-block">
+                    <span class="p-r-title-text">iProduct</span>
+                  </div>
+                  <div class="p-r-content-body-text">
+                    <p class="p-r-des-text mar-b-36">{{this.product.name}}</p>
+                    <p class="p-r-des-text-2 mar-b-36  mar-b-10">{{this.product.desc}}</p>
+                    <ul class="parameter-main-block">
                       <li class="parameter-item">
-                        <p class="p-r-des-text-2">{{this.key}}</p>
-                        <p class="p-r-des-text-2">{{this.value}}</p>
+                        <p class="p-r-des-text-2 price-num-text">Цена</p>
+                        <p class="p-r-des-text-2 price-num-text">{{this.product.price}} сум</p>
                       </li>
-                    {{/each}}
-                    <li class="parameter-item">
-                      <p class="p-r-des-text-2 price-num-text">Цена</p>
-                      <p class="p-r-des-text-2 price-num-text">{{this.product.price}} сум</p>
-                    </li>
-                    <li class="parameter-item basked-add-item">
-                      <a href="/product/{{this.product.id}}" class="add_basked">Подробнее</a>
-                    </li>
-                  </ul>
+                      <li class="parameter-item basked-add-item">
+                        <a href="/product/{{this.product.id}}" class="add_basked">Подробнее</a>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
-              <div class="presentation-img-content">
-                <div class="present-img-item"><img src="{{this.image.link}}" alt="" class="p-img-item-w"></div>
+                <div class="presentation-img-content">
+                  <div class="present-img-item"><img src="{{this.image.link}}" alt="" class="p-img-item-w"></div>
+                </div>
               </div>
             </div>
-          </div>
-        {{/each}}
-      </div>
-      <div class="nav_swiper">
-        <div class="btn-prev">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="nav_0icon0">
-            <path d="
+          {{/each}}
+        </div>
+        <div class="nav_swiper">
+          <div class="btn-prev">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="nav_0icon0">
+              <path d="
                     M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8
                     0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/>
-          </svg>
-        </div>
-        <div class="s-dot-block dots-container-js"></div>
-        <div class="btn-next">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="nav_0icon0">
-            <path d="
+            </svg>
+          </div>
+          <div class="s-dot-block dots-container-js"></div>
+          <div class="btn-next">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="nav_0icon0">
+              <path d="
                     M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8
                      0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/>
-          </svg>
+            </svg>
+          </div>
         </div>
       </div>
-    </div>
+    {{/if}}
   {{/each}}
 </div>
 
